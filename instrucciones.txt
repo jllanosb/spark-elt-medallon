@@ -1,0 +1,89 @@
+-------------------
+ EJECUTAR SERVICIOS 
+-------------------
+start-dfs.sh
+start-yarn.sh
+hive --service metastore &
+sleep 10
+hive --service hiveserver2 &
+
+------------------
+ EJECUTAR WORKLOAD 
+------------------
+--1. crear ruta hdfs para guardar .data
+hdfs dfs -mkdir -p /user/hadoop/dataset
+hdfs dfs -put /home/hadoop/spark-elt-medallon/dataset/* /user/hadoop/dataset/
+
+
+spark-submit \
+  --master yarn \
+  --deploy-mode cluster \
+  --conf spark.sql.warehouse.dir=/user/hadoop/warehouse \
+  --conf spark.serializer=org.apache.spark.serializer.KryoSerializer \
+  /home/hadoop/spark-elt-medallon/procesos/poblar_capa_workload.py \
+  --env TopicosB \
+  --username hadoop \
+  --base_path /user \
+  --local_data_path /user/hadoop/dataset
+
+------------------
+ EJECUTAR LANDING 
+------------------
+  --1. crear ruta hdfs para guardar AVSC
+hdfs dfs -mkdir -p /user/hadoop/datalake/schema/TopicosB_LANDING/
+hdfs dfs -put -f /home/hadoop/spark-project/schema/*.avsc /user/hadoop/datalake/schema/TopicosB_LANDING/
+hdfs dfs -ls /user/hadoop/datalake/schema/TopicosB_LANDING/
+
+
+spark-submit \
+  --master yarn \
+  --deploy-mode cluster \
+  --conf spark.sql.warehouse.dir=/user/hadoop/warehouse \
+  --conf spark.sql.avro.compression.codec=snappy \
+  --packages org.apache.spark:spark-avro_2.12:3.5.0 \
+  /home/hadoop/spark-elt-medallon/procesos/poblar_capa_landing.py \
+  --env TopicosB \
+  --username hadoop \
+  --base_path /user \
+  --schema_path /user/hadoop/datalake/schema/ \
+  --source_db TopicosB_workload
+
+------------------
+ EJECUTAR CURATED 
+------------------
+spark-submit \
+  --master yarn \
+  --deploy-mode cluster \
+  --conf spark.sql.warehouse.dir=/user/hadoop/warehouse \
+  --conf spark.sql.parquet.compression.codec=snappy \
+  --conf spark.dynamicAllocation.enabled=true \
+  --conf spark.executor.instances=10 \
+  --conf spark.executor.memory=4g \
+  --conf spark.driver.memory=2g \
+  /home/hadoop/spark-elt-medallon/procesos/poblar_capa_curated.py \
+  --env TopicosB \
+  --username hadoop \
+  --base_path /user \
+  --source_db landing \
+  --enable-validation
+
+--------------------
+ EJECUTAR FUNCTIONAL
+--------------------
+
+spark-submit \
+  --master yarn \
+  --deploy-mode client \
+  --conf spark.sql.warehouse.dir=/user/hadoop/warehouse \
+  --conf spark.yarn.queue=default \
+  --conf spark.sql.parquet.compression.codec=snappy \
+  --conf spark.dynamicAllocation.enabled=false \
+  /home/hadoop/spark-elt-medallon/procesos/poblar_capa_functional.py \
+  --env TopicosB \
+  --username hadoop \
+  --base_path /user \
+  --source_db curated \
+  --num-executors 8 \
+  --executor-memory 2g \
+  --executor-cores 2 \
+  --enable-broadcast
