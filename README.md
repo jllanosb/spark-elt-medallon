@@ -114,10 +114,10 @@ Compresión Snappy   1.1+            Balance velocidad/tamaño en datos
 
 
 
-    🏷️ Licencia: MIT - Libre uso para fines educativos y de investigación
-    👨‍💻 Autor: @jllanosb
+🏷️ Licencia: MIT - Libre uso para fines educativos y de investigación
+👨‍💻 Autor: @jllanosb
 
-    📅 Última actualización: Febrero 2026
-    🇵🇪 Contexto: Desarrollado con enfoque en formación en ingeniería de datos en entornos on-premise
+📅 Última actualización: Febrero 2026
+Contexto: Desarrollado con enfoque en formación en ingeniería de datos en entornos on-premise
 
 ✨ "La calidad de los datos no es un paso, es un viaje a través de capas de refinamiento" ✨
