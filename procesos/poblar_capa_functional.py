@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Proceso de carga - Capa Functional')
-    parser.add_argument('--env', type=str, default='TopicosB', help='Entorno: dev, qa, prod')
+    parser.add_argument('--env', type=str, default='TopicosB', help='Entorno: DEV, QA, PROD')
     parser.add_argument('--username', type=str, default='hadoop', help='Usuario HDFS')
     parser.add_argument('--base_path', type=str, default='/user', help='Ruta base en HDFS')
     parser.add_argument('--source_db', type=str, default='curated', help='Base de datos origen')

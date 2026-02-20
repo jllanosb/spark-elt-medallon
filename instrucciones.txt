@@ -13,6 +13,7 @@ hive --service hiveserver2 &
 --1. crear ruta hdfs para guardar .data
 hdfs dfs -mkdir -p /user/hadoop/dataset
 hdfs dfs -put /home/hadoop/spark-elt-medallon/dataset/* /user/hadoop/dataset/
+hdfs dfs -ls /user/hadoop/dataset
 
 
 spark-submit \
@@ -30,14 +31,14 @@ spark-submit \
  EJECUTAR LANDING 
 ------------------
   --1. crear ruta hdfs para guardar AVSC
-hdfs dfs -mkdir -p /user/hadoop/datalake/schema/TopicosB_LANDING/
-hdfs dfs -put -f /home/hadoop/spark-project/schema/*.avsc /user/hadoop/datalake/schema/TopicosB_LANDING/
-hdfs dfs -ls /user/hadoop/datalake/schema/TopicosB_LANDING/
+hdfs dfs -mkdir -p /user/hadoop/datalake/schema/TOPICOSB_LANDING/
+hdfs dfs -put -f /home/hadoop/spark-elt-medallon/schema/*.avsc /user/hadoop/datalake/schema/TOPICOSB_LANDING/
+hdfs dfs -ls /user/hadoop/datalake/schema/TOPICOSB_LANDING/
 
 
 spark-submit \
   --master yarn \
-  --deploy-mode cluster \
+  --deploy-mode client \
   --conf spark.sql.warehouse.dir=/user/hadoop/warehouse \
   --conf spark.sql.avro.compression.codec=snappy \
   --packages org.apache.spark:spark-avro_2.12:3.5.0 \
@@ -45,15 +46,15 @@ spark-submit \
   --env TopicosB \
   --username hadoop \
   --base_path /user \
-  --schema_path /user/hadoop/datalake/schema/ \
-  --source_db TopicosB_workload
+  --schema_path /user/hadoop/datalake/schema \
+  --source_db topicosb_workload
 
 ------------------
  EJECUTAR CURATED 
 ------------------
 spark-submit \
   --master yarn \
-  --deploy-mode cluster \
+  --deploy-mode client \
   --conf spark.sql.warehouse.dir=/user/hadoop/warehouse \
   --conf spark.sql.parquet.compression.codec=snappy \
   --conf spark.dynamicAllocation.enabled=true \
@@ -87,3 +88,13 @@ spark-submit \
   --executor-memory 2g \
   --executor-cores 2 \
   --enable-broadcast
+
+--------------------
+ DETENER SERVICIOS
+--------------------
+  stop-yarn.sh
+stop-dfs.sh
+
+# Si HiveServer2 está en ejecución:
+pkill -f HiveServer2
+pkill -f HiveMetaStore
