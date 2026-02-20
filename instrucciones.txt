@@ -92,7 +92,7 @@ spark-submit \
 --------------------
  DETENER SERVICIOS
 --------------------
-  stop-yarn.sh
+stop-yarn.sh
 stop-dfs.sh
 
 # Si HiveServer2 está en ejecución:
