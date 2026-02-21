@@ -18,7 +18,7 @@ hdfs dfs -ls /user/hadoop/dataset
 
 spark-submit \
   --master yarn \
-  --deploy-mode cluster \
+  --deploy-mode client \
   --conf spark.sql.warehouse.dir=/user/hadoop/warehouse \
   --conf spark.serializer=org.apache.spark.serializer.KryoSerializer \
   /home/hadoop/spark-elt-medallon/procesos/poblar_capa_workload.py \
