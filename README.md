@@ -281,7 +281,7 @@ Este proyecto está diseñado para fines educativos. ¡Las contribuciones son bi
 
 🏷️ Licencia: MIT - Libre uso para fines educativos y de investigación
 
-👨‍💻 Autor: @jllanosb
+👨‍💻 Autor: [@jllanosb](https://github.com/jllanosb)
 
 📅 Última actualización: Febrero 2026
 
