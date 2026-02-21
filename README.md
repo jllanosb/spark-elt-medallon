@@ -112,7 +112,7 @@ Compresión Snappy   1.1+            Balance velocidad/tamaño en datos
 
 # 🚀 Guía de Ejecución Paso a Paso
 
-🔹 Prerrequisitos
+## 🔹 Prerrequisitos
 ```text
 # Cluster Hadoop con servicios activos:
 ✅ HDFS en ejecución
@@ -121,8 +121,8 @@ Compresión Snappy   1.1+            Balance velocidad/tamaño en datos
 ✅ Spark instalado y configurado con Hive
 ✅ Acceso SSH al nodo edge con usuario `hadoop`
 ```
-🔹 Paso 1: Iniciar servicios (si es necesario)
-# Desde instrucciones.txt
+## 🔹 Paso 1: Iniciar servicios (si es necesario)
+### Desde instrucciones.txt
 ```bash
 start-dfs.sh
 start-yarn.sh
@@ -130,15 +130,15 @@ hive --service metastore &
 sleep 10
 hive --service hiveserver2 &
 ```
-🔹 Paso 2: Cargar datos fuente a HDFS
-# Crear directorio y subir archivos .data
+## 🔹 Paso 2: Cargar datos fuente a HDFS
+### Crear directorio y subir archivos .data
 ```bash
 hdfs dfs -mkdir -p /user/hadoop/dataset
 hdfs dfs -put /home/hadoop/spark-elt-medallon/dataset/* /user/hadoop/dataset/
 hdfs dfs -ls /user/hadoop/dataset  # Verificar carga
 ```
-🔹 Paso 3: Ejecutar cada capa del pipeline
-🥉 Capa WORKLOAD (Ingesta)
+## 🔹 Paso 3: Ejecutar cada capa del pipeline
+### 🥉 Capa WORKLOAD (Ingesta)
 ```pyspark
 spark-submit \
   --master yarn \
@@ -151,7 +151,7 @@ spark-submit \
   --base_path /user \
   --local_data_path /user/hadoop/dataset
 ```
-🥈 Capa LANDING (Estandarización Avro)
+### 🥈 Capa LANDING (Estandarización Avro)
 
 - Primero subir esquemas Avro
 ```bash
@@ -174,7 +174,7 @@ spark-submit \
   --schema_path /user/hadoop/datalake/schema \
   --source_db topicosb_workload
 ```
-🥇 Capa CURATED (Calidad y Limpieza)
+### 🥇 Capa CURATED (Calidad y Limpieza)
 ```pyspark
 spark-submit \
   --master yarn \
@@ -192,7 +192,7 @@ spark-submit \
   --source_db landing \
   --enable-validation  # ← Activa filtros de calidad
 ```
-⚡ Capa FUNCTIONAL (Enriquecimiento)
+### ⚡ Capa FUNCTIONAL (Enriquecimiento)
 ```pyspark
 spark-submit \
   --master yarn \
@@ -211,14 +211,14 @@ spark-submit \
   --executor-cores 2 \
   --enable-broadcast  # ← Optimiza JOINs con tablas pequeñas
 ```
-🔹 Paso 4: Detener servicios (opcional)
+## 🔹 Paso 4: Detener servicios (opcional)
 ```bash
 stop-yarn.sh
 stop-dfs.sh
 pkill -f HiveServer2
 pkill -f HiveMetaStore
 ```
-📊 Esquema de Datos
+# 📊 Esquema de Datos
 Entidad: PERSONA
 ```table
 Campo       Tipo Original       Tipo Final      Regla de Calidad
@@ -287,4 +287,4 @@ Este proyecto está diseñado para fines educativos. ¡Las contribuciones son bi
 
 Contexto: Desarrollado con enfoque en formación en ingeniería de datos en entornos on-premise
 
-# ✨ "La calidad de los datos no es un paso, es un viaje a través de capas de refinamiento" ✨
+## ✨ "La calidad de los datos no es un paso, es un viaje a través de capas de refinamiento" ✨
