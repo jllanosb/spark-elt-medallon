@@ -1,15 +1,15 @@
--------------------
- EJECUTAR SERVICIOS 
--------------------
+----------------------
+ 1. EJECUTAR SERVICIOS 
+----------------------
 start-dfs.sh
 start-yarn.sh
 hive --service metastore &
 sleep 10
 hive --service hiveserver2 &
 
-------------------
- EJECUTAR WORKLOAD 
-------------------
+-------------------------
+ 2. CARGAR CAPA WORKLOAD 
+-------------------------
 --1. crear ruta hdfs para guardar .data
 hdfs dfs -mkdir -p /user/hadoop/dataset
 hdfs dfs -put /home/hadoop/spark-elt-medallon/dataset/* /user/hadoop/dataset/
@@ -27,9 +27,9 @@ spark-submit \
   --base_path /user \
   --local_data_path /user/hadoop/dataset
 
-------------------
- EJECUTAR LANDING 
-------------------
+------------------------
+ 3. CARGAR CAPA LANDING 
+------------------------
   --1. crear ruta hdfs para guardar AVSC
 hdfs dfs -mkdir -p /user/hadoop/datalake/schema/TOPICOSB_LANDING/
 hdfs dfs -put -f /home/hadoop/spark-elt-medallon/schema/*.avsc /user/hadoop/datalake/schema/TOPICOSB_LANDING/
@@ -49,9 +49,9 @@ spark-submit \
   --schema_path /user/hadoop/datalake/schema \
   --source_db topicosb_workload
 
-------------------
- EJECUTAR CURATED 
-------------------
+------------------------
+ 4. CARGAR CAPA CURATED 
+------------------------
 spark-submit \
   --master yarn \
   --deploy-mode client \
@@ -68,9 +68,9 @@ spark-submit \
   --source_db landing \
   --enable-validation
 
---------------------
- EJECUTAR FUNCTIONAL
---------------------
+---------------------------
+ 5. CARGAR CAPA FUNCTIONAL
+---------------------------
 
 spark-submit \
   --master yarn \
@@ -89,8 +89,26 @@ spark-submit \
   --executor-cores 2 \
   --enable-broadcast
 
+-------------------------
+ 6. EXPORTAR GOLD TO CSV
+-------------------------
+spark-submit /home/hadoop/spark-elt-medallon/procesos/export_gold_to_csv.py
+
+----------------------------------------------
+ 7. CREAR COPIAR part*.csv RENOMBRAR GOLD.CSV
+----------------------------------------------
+
+cp /home/hadoop/spark-elt-medallon/datalake/temp/part-*.csv /home/hadoop/spark-elt-medallon/datalake/gold.csv
+
 --------------------
- DETENER SERVICIOS
+8. MIGRAR A MONGODB
+--------------------
+spark-submit \
+  --packages org.mongodb.spark:mongo-spark-connector_2.12:10.4.0 \
+  /home/hadoop/spark-elt-medallon/procesos/export_gold_to_mongo.py
+
+--------------------
+9. DETENER SERVICIOS
 --------------------
 stop-yarn.sh
 stop-dfs.sh
