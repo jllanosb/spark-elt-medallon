@@ -305,24 +305,35 @@ Datos listos para APIs, aplicaciones web o microservicios
 Usa mongo-spark-connector_2.12:10.4.0
 Conexión segura, tipada y optimizada
 
-### 🎯 Casos de uso habilitados
+### 📤 Exportación: Hive → CSV → MongoDB (Detalle Técnico)
+🔁 Flujo de transformación de formatos
 ```text
-┌─────────────────────────────────────────────────────┐
-│  📊 ANALÍTICA TRADICIONAL                           │
-│  • Consultas SQL en Hive/Spark                      │
-│  • Dashboards en herramientas BI                    │
-├─────────────────────────────────────────────────────┤
-│  📤 INTERCAMBIO DE DATOS                            │
-│  • gold.csv para compartir con equipos externos     │
-│  • Backup portátil de datos enriquecidos            │
-├─────────────────────────────────────────────────────┤
-│  🌐 APLICACIONES EN TIEMPO REAL                     │
-│  • MongoDB como backend para APIs REST              │
-│  • Consultas ágiles desde aplicaciones móviles/web  │
-└─────────────────────────────────────────────────────┘
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Hive Table     │     │  Archivo CSV    │     │  MongoDB Doc    │
+│  (Parquet)      │────▶│  (Texto plano)  │────▶│  (BSON/JSON)   │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+        ↓                       ↓                       ↓
+• Columnas tipadas      • Delimitador: coma       • Campos como claves
+• Particionado por      • Encoding: UTF-8         • Arrays/nested docs
+  fecha                 • Escape de comillas      • Índices configurables
+• Metadatos en Hive     • Header opcional         • TTL, sharding, etc.
 ```
+### 🔐 Consideraciones de seguridad para MongoDB
+```bash
+# ✅ URI con autenticación (recomendado en producción)
+mongodb://usuario:password@host:27017/db.collection?authSource=admin&ssl=true
 
-## 🔹 Paso 4: Detener servicios (opcional)
+# ✅ Variables de entorno para credenciales (nunca en código)
+export MONGO_USER="app_user"
+export MONGO_PASS="${MONGO_PASSWORD_SECRET}"
+spark-submit ... --conf spark.mongodb.output.uri="mongodb://${MONGO_USER}:${MONGO_PASS}@..."
+
+# ✅ Roles mínimos en MongoDB
+db.grantRolesToUser("app_user", [
+  { role: "readWrite", db: "medallon_db" }
+])
+```
+## 🔹 Paso 6: Detener servicios (opcional)
 ```bash
 stop-yarn.sh
 stop-dfs.sh
