@@ -211,6 +211,16 @@ spark-submit \
   --executor-cores 2 \
   --enable-broadcast  # ← Optimiza JOINs con tablas pequeñas
 ```
+### ⚡ EXPORTAR CAPA GOLD A CSV
+```pyspark
+spark-submit /home/hadoop/spark-elt-medallon/procesos/export_gold_to_csv.py
+```
+### ⚡ EXPORTAR CAPA GOLD.CSV A MONGODB
+```pyspark
+spark-submit \
+  --packages org.mongodb.spark:mongo-spark-connector_2.12:10.4.0 \
+  /home/hadoop/spark-elt-medallon/procesos/export_gold_to_mongo.py
+```
 ## 🔹 Paso 4: Detener servicios (opcional)
 ```bash
 stop-yarn.sh
@@ -281,7 +291,7 @@ Este proyecto está diseñado para fines educativos. ¡Las contribuciones son bi
 
 🏷️ Licencia: MIT - Libre uso para fines educativos y de investigación
 
-👨‍💻 Autor: [@jllanosb](https://github.com/jllanosb)
+👨‍💻 Autor: [Jaime Llanos](https://github.com/jllanosb)
 
 📅 Última actualización: Febrero 2026
 
