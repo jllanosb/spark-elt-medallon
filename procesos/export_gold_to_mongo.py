@@ -18,6 +18,11 @@ df = spark.read \
 # Mostrar esquema
 df.printSchema()
 
+print("========== DEBUG ==========")
+print("Registros en DF:", df.count())
+df.show(5, truncate=False)
+print("===========================")
+
 # Escribir en MongoDB
 df.write \
   .format("mongodb") \
