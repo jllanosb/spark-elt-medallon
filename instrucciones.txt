@@ -7,6 +7,10 @@ hive --service metastore &
 sleep 10
 hive --service hiveserver2 &
 
+cd airflow
+source venv/bin/activate
+airflow standalone
+
 -------------------------
  2. CARGAR CAPA WORKLOAD 
 -------------------------
