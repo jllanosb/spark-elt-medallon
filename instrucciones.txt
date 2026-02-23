@@ -92,18 +92,28 @@ spark-submit \
 -------------------------
  6. EXPORTAR GOLD TO CSV
 -------------------------
-spark-submit /home/hadoop/spark-elt-medallon/procesos/export_gold_to_csv.py
+spark-submit \
+  --master yarn \
+  --deploy-mode client \
+  --conf spark.sql.warehouse.dir=/user/hadoop/warehouse \
+  /home/hadoop/spark-elt-medallon/procesos/export_gold_to_csv.py
 
 ----------------------------------------------
  7. CREAR COPIAR part*.csv RENOMBRAR GOLD.CSV
 ----------------------------------------------
-
+# Copiar
 cp /home/hadoop/spark-elt-medallon/datalake/temp/part-*.csv /home/hadoop/spark-elt-medallon/datalake/gold.csv
+
+# Verificar resultado
+wc -l /home/hadoop/spark-elt-medallon/datalake/gold.csv
+head -5 /home/hadoop/spark-elt-medallon/datalake/gold.csv
 
 --------------------
 8. MIGRAR A MONGODB
 --------------------
 spark-submit \
+  --master yarn \
+  --deploy-mode client \
   --packages org.mongodb.spark:mongo-spark-connector_2.12:10.4.0 \
   /home/hadoop/spark-elt-medallon/procesos/export_gold_to_mongo.py
 

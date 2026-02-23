@@ -263,29 +263,19 @@ spark-submit \
 ```bash
 # Unir todas las particiones en un único archivo
 cat /user/hadoop/datalake/temp/gold_export/part-*.csv > /user/hadoop/datalake/gold.csv
+cp /home/hadoop/spark-elt-medallon/datalake/temp/part-*.csv /home/hadoop/spark-elt-medallon/datalake/gold.csv
 
 # Verificar resultado
-wc -l /user/hadoop/datalake/gold.csv
-head -5 /user/hadoop/datalake/gold.csv
-```
-Alternativa
-```bash
-cp /home/hadoop/spark-elt-medallon/datalake/temp/part-*.csv /home/hadoop/spark-elt-medallon/datalake/gold.csv
+wc -l /home/hadoop/spark-elt-medallon/datalake/gold.csv
+head -5 /home/hadoop/spark-elt-medallon/datalake/gold.csv
 ```
 ## 🔹 🆕 Paso 5: Migrar gold.csv a MongoDB
 ### ⚡ EXPORTAR CAPA GOLD.CSV A MONGODB
 ```pyspark
 spark-submit \
-  --packages org.mongodb.spark:mongo-spark-connector_2.12:10.4.0 \
-  /home/hadoop/spark-elt-medallon/procesos/export_gold_to_mongo.py
-```
-Alternativa
-```pyspark
-spark-submit \
   --master yarn \
   --deploy-mode client \
   --packages org.mongodb.spark:mongo-spark-connector_2.12:10.4.0 \
-  --conf spark.mongodb.output.uri="mongodb://localhost:27017/medallon_db.transacciones_enriquecidas" \
   /home/hadoop/spark-elt-medallon/procesos/export_gold_to_mongo.py
 ```
 ### 🔄 Novedades: Exportación CSV + MongoDB

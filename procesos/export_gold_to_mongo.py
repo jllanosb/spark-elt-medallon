@@ -12,15 +12,19 @@ spark = SparkSession.builder \
 df = spark.read \
     .option("header", "true") \
     .option("inferSchema", "true") \
-    .csv("file:/home/hadoop/spark-elt-medallon/datalake/gold.csv")
+    .csv("file:/home/hadoop/spark-elt-medallon/datalake/temp/part-*.csv")
+    #.csv("file:/home/hadoop/spark-elt-medallon/datalake/gold.csv")
 
 # Mostrar esquema
 df.printSchema()
 
 # Escribir en MongoDB
 df.write \
-    .format("mongodb") \
-    .mode("overwrite") \
-    .save()
+  .format("mongodb") \
+  .mode("overwrite") \
+  .option("spark.mongodb.connection.uri", "mongodb://192.168.0.11:27017") \
+  .option("spark.mongodb.database", "medallon") \
+  .option("spark.mongodb.collection", "gold") \
+  .save()
 
 spark.stop()
