@@ -8,6 +8,7 @@ sleep 10
 hive --service hiveserver2 &
 
 cd airflow
+# python3 -m venv venv --> Solo la primera vez
 source venv/bin/activate
 airflow standalone
 
